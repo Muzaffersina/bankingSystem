@@ -5,6 +5,7 @@ import java.util.Random;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import com.msa.bankingsystem.core.results.DataResult;
@@ -13,9 +14,10 @@ import com.msa.bankingsystem.core.results.ErrorResult;
 import com.msa.bankingsystem.core.results.Result;
 import com.msa.bankingsystem.core.results.SuccessDataResult;
 import com.msa.bankingsystem.core.results.SuccessResult;
-import com.msa.bankingsystem.dataAccess.IRepository;
+import com.msa.bankingsystem.dataAccess.account.IAccountRepository;
 import com.msa.bankingsystem.models.Account;
 import com.msa.bankingsystem.services.dtos.GetListLogDto;
+import com.msa.bankingsystem.services.kafka.IKafkaLoggerService;
 import com.msa.bankingsystem.services.requests.CreateAccountRequest;
 import com.msa.bankingsystem.services.requests.CreateDepositRequest;
 import com.msa.bankingsystem.services.requests.CreateTransferRequest;
@@ -25,14 +27,19 @@ public class AccountManager implements IAccountService {
 
 	@Value("${account.type}")
 	private List<String> definedTypes;
+	@Value(value = "${kafka.topicName}")
+	public String topicName;
 
-	private IRepository iRepository;
+	private IAccountRepository iRepository;
 	private IKafkaLoggerService iKafkaLoggerService;
+	private KafkaTemplate<String, String> kafkaTemplate;
 
 	@Autowired
-	public AccountManager(List<String> definedTypes, IRepository iRepository, IKafkaLoggerService iKafkaLoggerService) {
+	public AccountManager(List<String> definedTypes, IAccountRepository iRepository, IKafkaLoggerService iKafkaLoggerService,
+			KafkaTemplate<String, String> kafkaTemplate) {
 		this.definedTypes = definedTypes;
 		this.iRepository = iRepository;
+		this.kafkaTemplate = kafkaTemplate;
 		this.iKafkaLoggerService = iKafkaLoggerService;
 	}
 
@@ -71,7 +78,7 @@ public class AccountManager implements IAccountService {
 
 		String message = accountNumber + " deposit amount:" + createDepositRequest.getAmount() + " "
 				+ account.getType();
-		this.iKafkaLoggerService.sendMessage(message);
+		kafkaTemplate.send(topicName, message);		
 		return new SuccessDataResult<Account>(account, "Deposit Operation Successful");
 	}
 
@@ -93,7 +100,7 @@ public class AccountManager implements IAccountService {
 				String message = accountNumber + " transfer amount:" + createTransferRequest.getAmount() + " "
 						+ account.getType() + " transferred_account:"
 						+ createTransferRequest.getTransferredAccountNumber();
-				this.iKafkaLoggerService.sendMessage(message);
+				kafkaTemplate.send(topicName, message);				
 				return new SuccessDataResult<Account>(account, message);
 			}
 		}

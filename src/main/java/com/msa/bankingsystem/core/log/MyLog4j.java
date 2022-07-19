@@ -6,7 +6,7 @@ import org.apache.log4j.xml.DOMConfigurator;
 import org.springframework.stereotype.Service;
 
 @Service
-public class MyLog4j implements ILogService {
+public class MyLog4j implements ILogFileService {
 
 	static Logger logger = Logger.getLogger(MyLog4j.class);
 
@@ -16,19 +16,7 @@ public class MyLog4j implements ILogService {
 	}
 
 	@Override
-	public void info(String text) {
+	public void save(String text) {
 		logger.info(text);
 	}
-
-	@Override
-	public void warn(String text) {
-		logger.warn(text);
-	}
-
-	@Override
-	public void error(String text) {
-		logger.error(text);
-
-	}
-
 }

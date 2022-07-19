@@ -1,10 +1,10 @@
-package com.msa.bankingsystem.dataAccess;
+package com.msa.bankingsystem.dataAccess.account;
 
 import java.util.List;
 
 import com.msa.bankingsystem.models.Account;
 
-public interface IRepository {
+public interface IAccountRepository {
 
 	void save(Account account);
 

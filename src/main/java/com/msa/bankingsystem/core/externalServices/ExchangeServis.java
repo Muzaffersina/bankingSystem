@@ -12,7 +12,7 @@ import org.springframework.web.client.RestTemplate;
 import com.msa.bankingsystem.core.mapper.ExchangeServisResponseMapper;
 
 @Component
-public class ExchangeServis {
+public class ExchangeServis implements ExchangeChanger {
 
 	private RestTemplate restTemplate;
 
@@ -26,7 +26,8 @@ public class ExchangeServis {
 
 		this.restTemplate = restTemplate;
 	}
-
+	
+	@Override
 	public double calculateExchange(String base, String to, double amount) {
 
 		HttpHeaders headers = new HttpHeaders();

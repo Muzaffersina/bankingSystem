@@ -1,4 +1,4 @@
-package com.msa.bankingsystem.services;
+package com.msa.bankingsystem.services.kafka;
 
 import java.util.List;
 
@@ -9,6 +9,5 @@ public interface IKafkaLoggerService {
 
 	DataResult<List<GetListLogDto>> getLogsByAccountNumber(String accountNumber);
 
-	void sendMessage(String message);
-
+	void kafkaListener(String message);
 }

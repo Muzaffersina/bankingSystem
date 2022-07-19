@@ -42,6 +42,7 @@ public class AccountsController {
 	private ResponseEntity<Result> createAccount(@RequestBody CreateAccountRequest createAccountRequest) {
 
 		Result result = this.iAccountService.create(createAccountRequest);
+
 		if (result.isSuccess()) {
 			return new ResponseEntity<>(result, HttpStatus.CREATED);
 		}
@@ -53,15 +54,15 @@ public class AccountsController {
 			@PathVariable(name = "accountNumber") String accountNumber) {
 
 		DataResult<Account> account = this.iAccountService.getByAccountNumber(accountNumber);
-
+		if (!account.isSuccess() || account == null) {
+			return new ResponseEntity<>((DataResult) account, HttpStatus.NOT_FOUND);
+		}
 		DataResult<GetListAccountDto> dataResult = new DataResult<GetListAccountDto>(
 				this.accountDtoMapper.accountToAccountDto(account.getData()), account.isSuccess(),
 				account.getMessage());
 
-		if (dataResult.isSuccess()) {
-			return ResponseEntity.ok().body(dataResult);
-		}
-		return new ResponseEntity<>(dataResult, HttpStatus.NOT_FOUND);
+		return ResponseEntity.ok().body(dataResult);
+
 	}
 
 	@PutMapping(path = "/account/{accountNumber}")
@@ -70,9 +71,11 @@ public class AccountsController {
 			@RequestBody CreateDepositRequest createDepositRequest) {
 
 		DataResult<Account> account = this.iAccountService.deposit(accountNumber, createDepositRequest);
+
 		if (!account.isSuccess() || account == null) {
 			return new ResponseEntity<>((DataResult) account, HttpStatus.NOT_FOUND);
 		}
+
 		DataResult<GetListAccountDto> dataResult = new DataResult<GetListAccountDto>(
 				this.accountDtoMapper.accountToAccountDto(account.getData()), account.isSuccess(),
 				account.getMessage());
@@ -88,6 +91,7 @@ public class AccountsController {
 
 		DataResult<Account> account = this.iAccountService.transferBetweenAccounts(transferAccountNumber,
 				createTransferRequest);
+
 		if (!account.isSuccess() || account == null) {
 			return new ResponseEntity<>((DataResult) account, HttpStatus.BAD_REQUEST);
 		}
@@ -108,6 +112,7 @@ public class AccountsController {
 		DataResult<List<GetListAccountDto>> dataResult = new DataResult<List<GetListAccountDto>>(
 				this.accountDtoMapper.listAccountToListAccountDto(account.getData()), account.isSuccess(),
 				account.getMessage());
+
 		return ResponseEntity.ok().body(dataResult);
 	}
 
@@ -115,7 +120,9 @@ public class AccountsController {
 	@GetMapping(path = "/account/logs/{accountNumber}")
 	private ResponseEntity<DataResult<List<GetListLogDto>>> getLogs(
 			@PathVariable(name = "accountNumber") String accountNumber) {
+
 		DataResult<List<GetListLogDto>> dataResult = this.iAccountService.getAccountLogsByAccountNumber(accountNumber);
+
 		if (dataResult.isSuccess()) {
 			return ResponseEntity.ok().body(dataResult);
 		}

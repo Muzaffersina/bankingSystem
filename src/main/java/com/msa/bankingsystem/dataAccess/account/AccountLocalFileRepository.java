@@ -1,20 +1,20 @@
-package com.msa.bankingsystem.dataAccess;
+package com.msa.bankingsystem.dataAccess.account;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 
-import com.msa.bankingsystem.core.externalServices.ExchangeServis;
+import com.msa.bankingsystem.core.externalServices.ExchangeChanger;
 import com.msa.bankingsystem.core.file.FileReaders;
 import com.msa.bankingsystem.core.file.FileWriters;
 import com.msa.bankingsystem.core.mapper.AccountMapper;
 import com.msa.bankingsystem.models.Account;
 
-@Component
-public class LocalFileRepository implements IRepository {
+@Repository
+public class AccountLocalFileRepository implements IAccountRepository {
 
 	@Value("${local.dbFile}")
 	private String filePath;
@@ -22,15 +22,15 @@ public class LocalFileRepository implements IRepository {
 	private FileWriters fileWriters;
 	private FileReaders fileReaders;
 	private AccountMapper accountMapper;
-	private ExchangeServis exchangeServis;
+	private ExchangeChanger exchangeChanger;
 
 	@Autowired
-	public LocalFileRepository(FileWriters fileWriters, FileReaders fileReaders, AccountMapper accountMapper,
-			ExchangeServis exchangeServis) {
+	public AccountLocalFileRepository(FileWriters fileWriters, FileReaders fileReaders, AccountMapper accountMapper,
+			ExchangeChanger exchangeChanger) {
 		this.fileWriters = fileWriters;
 		this.fileReaders = fileReaders;
 		this.accountMapper = accountMapper;
-		this.exchangeServis = exchangeServis;
+		this.exchangeChanger = exchangeChanger;
 	}
 
 	@Override
@@ -71,7 +71,7 @@ public class LocalFileRepository implements IRepository {
 
 		double exchangeAmount = amount;
 		if (!account.getType().equals(transferredAccount.getType())) {
-			exchangeAmount = this.exchangeServis.calculateExchange(account.getType(), transferredAccount.getType(),
+			exchangeAmount = this.exchangeChanger.calculateExchange(account.getType(), transferredAccount.getType(),
 					amount);
 		}
 		updateBalance(accountNumber, -amount);
