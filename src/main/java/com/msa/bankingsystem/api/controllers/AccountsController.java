@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -50,7 +51,7 @@ public class AccountsController {
 	}
 
 	@GetMapping(path = "/account/{accountNumber}")
-	private ResponseEntity<DataResult<GetListAccountDto>> getAccount(
+	private ResponseEntity<DataResult<GetListAccountDto>> getAccountByAccountId(
 			@PathVariable(name = "accountNumber") String accountNumber) {
 
 		DataResult<Account> account = this.iAccountService.getByAccountNumber(accountNumber);
@@ -84,12 +85,12 @@ public class AccountsController {
 
 	}
 
-	@PutMapping(path = "/account/transfer/{transferAccountNumber}")
+	@PutMapping(path = "/account/transfer/{senderAccountNumber}")
 	private ResponseEntity<DataResult<GetListAccountDto>> transferBetweenAccounts(
-			@PathVariable(name = "transferAccountNumber") String transferAccountNumber,
+			@PathVariable(name = "senderAccountNumber") String senderAccountNumber,
 			@RequestBody CreateTransferRequest createTransferRequest) {
 
-		DataResult<Account> account = this.iAccountService.transferBetweenAccounts(transferAccountNumber,
+		DataResult<Account> account = this.iAccountService.transferBetweenAccounts(senderAccountNumber,
 				createTransferRequest);
 
 		if (!account.isSuccess() || account == null) {
@@ -102,6 +103,18 @@ public class AccountsController {
 
 		return ResponseEntity.ok().lastModified(account.getData().getLastUpdateDate()).body(dataResult);
 
+	}
+
+	@DeleteMapping("/account/{accountNumber}")
+	public ResponseEntity<Result> delete(@PathVariable String accountNumber) {
+
+		DataResult<Account> account = this.iAccountService.delete(accountNumber);
+		Result result = new Result(account.isSuccess(), account.getMessage());
+		if (!account.isSuccess() || account == null) {
+			return new ResponseEntity<>(result, HttpStatus.BAD_REQUEST);
+
+		}
+		return ResponseEntity.ok().lastModified(account.getData().getLastUpdateDate()).body(result);
 	}
 
 	@GetMapping(path = "/accounts")

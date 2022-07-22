@@ -14,7 +14,7 @@ public class FileReaders {
 		List<String> data = new ArrayList<>();
 
 		try (FileReader fileReader = new FileReader(filePath);
-				BufferedReader bufferedReader = new BufferedReader(fileReader)) {
+			BufferedReader bufferedReader = new BufferedReader(fileReader)) {
 			String line = bufferedReader.readLine();
 			while (line != null) {
 				data.add(line);

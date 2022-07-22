@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+    <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="logMapper">
+
+	<select id="get"
+		resultType="com.msa.bankingsystem.models.Log">
+		SELECT * FROM logs
+	</select>
+	
+	<select id="getBySenderAccountNumber"
+		resultType="com.msa.bankingsystem.models.Log">
+		SELECT * FROM logs WHERE senderAccountNumber = #{senderAccountNumber}
+	</select>	
+
+	<insert id="save">
+		INSERT INTO
+		logs(id,senderAccountNumber,transferredAccountNumber,operationType,currency,amount,message)
+		VALUES
+		(#{id},#{senderAccountNumber},#{transferredAccountNumber},#{operationType},#{currency},#{amount},#{message})
+	</insert>
+</mapper>

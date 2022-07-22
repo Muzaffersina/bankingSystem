@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Account {
+	private int id;
 	private String accountNumber;
 	private String name;
 	private String surname;
@@ -18,4 +19,5 @@ public class Account {
 	private String type;
 	private double balance;
 	private long lastUpdateDate;
+	private boolean isDeleted;
 }

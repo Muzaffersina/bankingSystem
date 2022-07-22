@@ -1,4 +1,4 @@
-package com.msa.bankingsystem.services.kafka;
+package com.msa.bankingsystem.services.log;
 
 import java.util.List;
 

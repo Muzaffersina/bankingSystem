@@ -8,11 +8,16 @@ public interface IAccountRepository {
 
 	void save(Account account);
 
+	Account delete(String accountNumber);
+
+	Account transferBetweenAccounts(String senderAccountNumber, String transferredAccountNumber, double amount,
+			double exchangeAmount);
+
+	Account update(String accountNumber, double amount);
+
 	Account getByAccountNumber(String accountNumber);
 
 	List<Account> getAll();
 
-	Account update(String accountNumber, double amount);
-
-	Account transferBetweenAccounts(String accountNumber, String transferredAccountNumber, double amount);
+	Account getByAccounId(int id);
 }

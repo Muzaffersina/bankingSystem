@@ -1,49 +1,66 @@
 # BANKING SYSTEM :bank:
 
+## You can save to file or database. (account information and logs)
+:point_right: You can make this selection from the data Access  package.
+
 - You can create account. ( accountType must be : TRY , USD , EUR)
 - You can get Account details by accountNumber. 
 - You can deposit money with your accountNumber. ( :star2: The "last modified" header will be added to the headers)
 - You can transfer money between accounts. ( :star2: Currency will be changed automatically - :star2: The "last modified" header will be added to the headers )
 - You can get account logs with account number. ( :star2: CrossOrigin)
+- You can soft delete Account with accountNumber. :star2: The "last modified" header will be added to the headers)
 - And you can get all account details.
 
 # 
+
+
+:exclamation: If you want to save in database, you need to make the necessary configurations from the myBatis_conf.xml.
+
 :exclamation: You have to write your Collection API Key in exchangeServis.properties.
 
 :exclamation: Apache kafka was used for account logs.
 
 :star: Firstall you have to start zookeeper server and apache kafka server from console then the topic will be created automatically when the application is started.
 
-- ### | (Post Method) Create Account |  .../api/account  
+
+| **Method**        | **Url**                     | **Description**        | **Body** |
+| ------------- |:-------------                          | :------------      | :------------| 
+| Post          | .../api/account                               | Create Account| Necessary| 
+| Put           | .../api/account/{accountNumber}               | Deposit | Necessary| 
+| Put           | .../api/account/transfer/{senderAccountNumber}| Money Transfer Between Accounts| Necessary| 
+| Delete        | .../api/account/{accountNumber}      | Soft Delete Account |Not Necessary| 
+| Get           | .../api/account/logs/{accountNumber} | Account Logs Details|Not Necessary| 
+| Get           | .../api/account/{accountNumber}      | Get Account Details |Not Necessary| 
+| Get           | .../api/accounts                     | Get All Accounts Details| Not Necessary| 
+
+- Body;
+
+  - For Create Account;
+      ```
+    {
+    "name": "string",
+    "surname": "string",
+    "email": "string",
+    "idendityNumber": "string",
+    "type": "string"
+    }
+      ```
+
+  - For Deposit; 
+
     ```
     {
-  "name": "string",
-  "surname": "string",
-  "email": "string",
-  "idendityNumber": "string",
-  "type": "string"
+     "amount": 0
     }
     ```
 
-- ###  | (Put Method) Deposit |  .../api/account/{accountNumber} 
-    ```
+  - For Money Transfer Between Accounts;
+    ```   
     {
-  "amount": 0
+      "transferredAccountNumber": "string",
+      "amount": 0
     }
     ```
-
-- ###  | (Put Method) Money Transfer Between Accounts |  .../api/account/transfer/{transferToFromAccountNumber}
-    ```
-    {
-  "transferredAccountNumber": "string",
-  "amount": 0
-    }
-    ```
-- ###  | (Get Method) Get Account Logs Details | .../api/account/logs/{accountNumber}
-- ###  | (Get Method) Get Account Details | .../api/account/{accountNumber}
-- ###  | (Get Method) Get All Account Details | .../api/accounts 
-
-#
 
 #### CollectAPI is used in this project -> https://collectapi.com/api/economy/gold-currency-and-exchange-api/exchange
 

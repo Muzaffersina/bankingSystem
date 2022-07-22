@@ -13,12 +13,14 @@ import com.msa.bankingsystem.services.requests.CreateTransferRequest;
 public interface IAccountService {
 
 	Result create(CreateAccountRequest createAccountRequest);
+	
+	DataResult<Account> delete(String accountNumber);
 
-	DataResult<Account> getByAccountNumber(String accountNumber);
+	DataResult<Account> getByAccountNumber(String accountNumber);	
 
 	DataResult<Account> deposit(String accountNumber, CreateDepositRequest createDepositRequest);
 
-	DataResult<Account> transferBetweenAccounts(String accountNumber, CreateTransferRequest createTransferRequest);
+	DataResult<Account> transferBetweenAccounts(String senderAccountNumber, CreateTransferRequest createTransferRequest);
 
 	DataResult<List<Account>> getAll();
 

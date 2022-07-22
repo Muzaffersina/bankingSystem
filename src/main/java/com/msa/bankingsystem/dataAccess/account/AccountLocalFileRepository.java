@@ -22,7 +22,6 @@ public class AccountLocalFileRepository implements IAccountRepository {
 	private FileWriters fileWriters;
 	private FileReaders fileReaders;
 	private AccountMapper accountMapper;
-	private ExchangeChanger exchangeChanger;
 
 	@Autowired
 	public AccountLocalFileRepository(FileWriters fileWriters, FileReaders fileReaders, AccountMapper accountMapper,
@@ -30,30 +29,37 @@ public class AccountLocalFileRepository implements IAccountRepository {
 		this.fileWriters = fileWriters;
 		this.fileReaders = fileReaders;
 		this.accountMapper = accountMapper;
-		this.exchangeChanger = exchangeChanger;
+
 	}
 
 	@Override
 	public void save(Account account) {
 
+		account.setId(checkLastId());
 		String text = this.accountMapper.accountToString(account);
-
 		this.fileWriters.writeToFile(filePath, text, true);
-
 	}
 
 	@Override
-	public Account getByAccountNumber(String accountNumber) {
+	public Account delete(String accountNumber) {
 
 		List<String> fileRead = this.fileReaders.readFile(filePath);
+		List<Account> accounts = new ArrayList<>();
 
 		for (String readLine : fileRead) {
-			if (readLine.startsWith(accountNumber) && accountNumber.length() == 10) {
+			if (!readLine.contains(accountNumber) && accountNumber.length() == 10) {
 				Account account = accountMapper.stringToAccount(readLine);
-				return account;
+				accounts.add(account);
+			} else {
+				Account account = accountMapper.stringToAccount(readLine);
+				account.setDeleted(true);
+				account.setLastUpdateDate(System.currentTimeMillis());
+				accounts.add(account);
 			}
 		}
-		return null;
+		this.fileWriters.writeToFile(filePath, "", false);
+		saveAccounts(accounts);
+		return getByAccountNumber(accountNumber);
 	}
 
 	@Override
@@ -64,21 +70,26 @@ public class AccountLocalFileRepository implements IAccountRepository {
 	}
 
 	@Override
-	public Account transferBetweenAccounts(String accountNumber, String transferredAccountNumber, double amount) {
-
-		Account account = getByAccountNumber(accountNumber);
-		Account transferredAccount = getByAccountNumber(transferredAccountNumber);
-
-		double exchangeAmount = amount;
-		if (!account.getType().equals(transferredAccount.getType())) {
-			exchangeAmount = this.exchangeChanger.calculateExchange(account.getType(), transferredAccount.getType(),
-					amount);
-		}
-		updateBalance(accountNumber, -amount);
+	public Account transferBetweenAccounts(String senderAccountNumber, String transferredAccountNumber, double amount,
+			double exchangeAmount) {
+		updateBalance(senderAccountNumber, -amount);
 		updateBalance(transferredAccountNumber, exchangeAmount);
 
-		return getByAccountNumber(accountNumber);
+		return getByAccountNumber(senderAccountNumber);
 
+	}
+
+	@Override
+	public Account getByAccountNumber(String accountNumber) {
+
+		List<String> fileRead = this.fileReaders.readFile(filePath);
+		for (String readLine : fileRead) {
+			if (readLine.contains(accountNumber) && accountNumber.length() == 10) {
+				Account account = accountMapper.stringToAccount(readLine);
+				return account;
+			}
+		}
+		return null;
 	}
 
 	@Override
@@ -99,7 +110,8 @@ public class AccountLocalFileRepository implements IAccountRepository {
 		List<Account> accounts = new ArrayList<>();
 
 		for (String readLine : fileRead) {
-			if (!readLine.startsWith(accountNumber) && accountNumber.length() == 10) {
+			if (!readLine.contains(accountNumber) && accountNumber.length() == 10) {
+
 				Account account = accountMapper.stringToAccount(readLine);
 				accounts.add(account);
 			} else {
@@ -108,15 +120,35 @@ public class AccountLocalFileRepository implements IAccountRepository {
 				account.setLastUpdateDate(System.currentTimeMillis());
 				accounts.add(account);
 			}
-			this.fileWriters.writeToFile(filePath, "", false);
-			saveAccounts(accounts);
 		}
+		this.fileWriters.writeToFile(filePath, "", false);
+		saveAccounts(accounts);
+	}
+
+	@Override
+	public Account getByAccounId(int id) {
+
+		List<String> fileRead = this.fileReaders.readFile(filePath);
+		String stringId = String.valueOf(id);
+
+		for (String readLine : fileRead) {
+			if (readLine.startsWith(stringId + ",")) {
+				Account account = accountMapper.stringToAccount(readLine);
+				return account;
+			}
+		}
+		return null;
 	}
 
 	private void saveAccounts(List<Account> accounts) {
 		for (Account account : accounts) {
 			save(account);
 		}
+	}
+
+	private int checkLastId() {
+		List<Account> accounts = getAll();
+		return accounts.size() + 1;
 	}
 
 }

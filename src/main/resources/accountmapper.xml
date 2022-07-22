@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+    <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="accountMapper">
+
+	<select id="getAll"
+		resultType="com.msa.bankingsystem.models.Account">
+		SELECT * FROM accounts
+	</select>
+
+	<select id="getByAccountNumber"
+		resultType="com.msa.bankingsystem.models.Account">
+		SELECT * FROM accounts WHERE accountNumber =
+		#{accountNumber}
+	</select>
+
+	<select id="getByAccountId"
+		resultType="com.msa.bankingsystem.models.Account">
+		SELECT * FROM accounts WHERE id = #{id}
+	</select>
+
+	<insert id="save">
+		INSERT INTO
+		accounts(id,accountNumber,name,surname,email,idendityNumber,type,balance,lastUpdateDate,isDeleted)
+		VALUES
+		(#{id},#{accountNumber},#{name},#{surname},#{email},#{idendityNumber},#{type},#{balance},#{lastUpdateDate},#{isDeleted})
+	</insert>
+
+	<update id="updateBalance">
+		UPDATE accounts SET balance = #{balance} , lastUpdateDate = #{lastUpdateDate} WHERE
+		accountNumber = #{accountNumber}
+	</update>
+
+	<update id="updateDeletedColumn">
+		UPDATE accounts SET isDeleted =
+		false , lastUpdateDate = #{lastUpdateDate} WHERE accountNumber =
+		#{accountNumber}
+	</update>
+
+
+</mapper>

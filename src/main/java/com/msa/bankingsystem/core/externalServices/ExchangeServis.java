@@ -26,7 +26,7 @@ public class ExchangeServis implements ExchangeChanger {
 
 		this.restTemplate = restTemplate;
 	}
-	
+
 	@Override
 	public double calculateExchange(String base, String to, double amount) {
 
