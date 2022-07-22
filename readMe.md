@@ -20,6 +20,8 @@
 
 :exclamation: Apache kafka was used for account logs.
 
+:exclamation: myBatis was used to access the database. (MyBatis couples objects with stored procedures or SQL statements using an XML descriptor or annotations)
+
 :star: Firstall you have to start zookeeper server and apache kafka server from console then the topic will be created automatically when the application is started.
 
 
@@ -66,6 +68,8 @@
 
 #
 
-<img src="https://raw.githubusercontent.com/github/explore/5b3600551e122a3277c2c5368af2ad5725ffa9a1/topics/java/java.png" align="left" height="30" width="30" />
-<img src= "https://raw.githubusercontent.com/github/explore/80688e429a7d4ef2fca1e82350fe8e3517d3494d/topics/spring-boot/spring-boot.png" align="left" height="30" width="30">
-<img src="https://cdn.jsdelivr.net/npm/simple-icons@v7/icons/apachekafka.svg" height="30" width="30" />
+<img src="https://raw.githubusercontent.com/github/explore/5b3600551e122a3277c2c5368af2ad5725ffa9a1/topics/java/java.png" align="left" height="50" width="50" />
+<img src= "https://raw.githubusercontent.com/github/explore/80688e429a7d4ef2fca1e82350fe8e3517d3494d/topics/spring-boot/spring-boot.png" align="left" height="50" width="50">
+<img src="https://cdn.jsdelivr.net/npm/simple-icons@v7/icons/apachekafka.svg" align="left" height="50" width="50" />
+<img src= "https://camo.githubusercontent.com/cf460363010bff63a7ba0f3773819739c8daddd25284e90eaab6e947a35deabe/687474703a2f2f6d7962617469732e6769746875622e696f2f696d616765732f6d7962617469732d6c6f676f2e706e67" height="50">
+
