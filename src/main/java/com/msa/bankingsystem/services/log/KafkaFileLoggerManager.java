@@ -11,6 +11,7 @@ import com.msa.bankingsystem.core.results.DataResult;
 import com.msa.bankingsystem.core.results.SuccessDataResult;
 import com.msa.bankingsystem.dataAccess.log.ILogRepository;
 import com.msa.bankingsystem.services.dtos.GetListLogDto;
+import com.msa.bankingsystem.services.message.Messages;
 
 @Service
 public class KafkaFileLoggerManager implements IKafkaLoggerService {
@@ -35,9 +36,9 @@ public class KafkaFileLoggerManager implements IKafkaLoggerService {
 	public DataResult<List<GetListLogDto>> getLogsByAccountNumber(String accountNumber) {
 		List<GetListLogDto> dtos = this.iLogRepository.getLogsByAccountNumber(accountNumber);
 		if (dtos.isEmpty()) {
-			return new SuccessDataResult<List<GetListLogDto>>(null, "No Record Found For This Account Number.");
+			return new SuccessDataResult<List<GetListLogDto>>(null, Messages.NOTFOUNDLOGDETAILSBYACCOUNTNUMBER);
 		}
-		return new SuccessDataResult<List<GetListLogDto>>(dtos, "Listed Logs for accountNumber: " + accountNumber);
+		return new SuccessDataResult<List<GetListLogDto>>(dtos, Messages.LISTEDLOGSBYACCOUNTNUMBER + accountNumber);
 
 	}
 }

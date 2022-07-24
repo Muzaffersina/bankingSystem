@@ -8,10 +8,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
+import com.msa.bankingsystem.core.exception.BusinessException;
 import com.msa.bankingsystem.core.externalServices.ExchangeChanger;
 import com.msa.bankingsystem.core.results.DataResult;
-import com.msa.bankingsystem.core.results.ErrorDataResult;
-import com.msa.bankingsystem.core.results.ErrorResult;
 import com.msa.bankingsystem.core.results.Result;
 import com.msa.bankingsystem.core.results.SuccessDataResult;
 import com.msa.bankingsystem.core.results.SuccessResult;
@@ -19,6 +18,7 @@ import com.msa.bankingsystem.dataAccess.account.IAccountRepository;
 import com.msa.bankingsystem.models.Account;
 import com.msa.bankingsystem.services.dtos.GetListLogDto;
 import com.msa.bankingsystem.services.log.IKafkaLoggerService;
+import com.msa.bankingsystem.services.message.Messages;
 import com.msa.bankingsystem.services.requests.CreateAccountRequest;
 import com.msa.bankingsystem.services.requests.CreateDepositRequest;
 import com.msa.bankingsystem.services.requests.CreateTransferRequest;
@@ -50,93 +50,79 @@ public class AccountManager implements IAccountService {
 	@Override
 	public Result create(CreateAccountRequest createAccountRequest) {
 
-		if (!checkIfType(createAccountRequest.getType(), this.definedTypes)) {
-			return new ErrorResult("Invalid Account Type: " + createAccountRequest.getType());
-		}
+		checkIfType(createAccountRequest.getType(), this.definedTypes);
 
 		Account account = manuelAccountMapper(createAccountRequest);
 		account.setDeleted(false);
 		account.setLastUpdateDate(System.currentTimeMillis());
 		account.setBalance(0);
 		this.iAccountRepository.save(account);
-		return new SuccessResult("Created Account , Account Number =" + account.getAccountNumber());
+		return new SuccessResult(Messages.CREATEACCOUNT + account.getAccountNumber());
 	}
 
 	@Override
 	public DataResult<Account> delete(String accountNumber) {
 
-		if (!checkIfAccountExists(accountNumber)) {
-			return new ErrorDataResult<Account>("This account id cannot be found");
-		}
+		checkIfAccountExists(accountNumber);
+
 		Account account = this.iAccountRepository.delete(accountNumber);
-		return new SuccessDataResult<Account>(account, "Deleted Account By AccountId ");
+
+		return new SuccessDataResult<Account>(account, Messages.DELETEACCOUNTBYID);
 	}
 
 	@Override
 	public DataResult<Account> getByAccountNumber(String accountNumber) {
 
+		checkIfAccountExists(accountNumber);
+
 		Account account = this.iAccountRepository.getByAccountNumber(accountNumber);
 
-		if (account == null) {
-			return new ErrorDataResult<Account>("This account number cannot be found");
-		}
-
-		return new SuccessDataResult<Account>(account, "Listed Account By AccountNumber");
+		return new SuccessDataResult<Account>(account, Messages.LISTEDACCOUNTBYACCOUNTNO);
 	}
 
 	@Override
 	public DataResult<Account> deposit(String accountNumber, CreateDepositRequest createDepositRequest) {
 
-		if (!checkIfAccountExists(accountNumber)) {
-			return new ErrorDataResult<Account>(null, "Please Check Your Account Information");
-		}
+		checkIfAccountExists(accountNumber);
 		Account account = this.iAccountRepository.update(accountNumber, createDepositRequest.getAmount());
 
 		String message = accountNumber + " deposit amount:" + createDepositRequest.getAmount() + " "
 				+ account.getType();
 		kafkaTemplate.send(topicName, message);
-		return new SuccessDataResult<Account>(account, "Deposit Operation Successful");
+		return new SuccessDataResult<Account>(account, Messages.SUCCESSDEPOSİTOPERATİON);
 	}
 
 	@Override
 	public DataResult<Account> transferBetweenAccounts(String senderAccountNumber,
 			CreateTransferRequest createTransferRequest) {
 
-		if (!checkIfAccountExists(senderAccountNumber)
-				|| !checkIfAccountExists(createTransferRequest.getTransferredAccountNumber())) {
-			return new ErrorDataResult<Account>("Please Check Your Accounts Information");
-		} else {
-			if (!checkIfEnoughBalance(senderAccountNumber, createTransferRequest.getAmount())) {
-				return new ErrorDataResult<Account>("Insufficient balance");
-			} else {
+		checkIfAccountExists(senderAccountNumber);
+		checkIfAccountExists(createTransferRequest.getTransferredAccountNumber());
 
-				double exchangeAmount = checkExchangeAmount(senderAccountNumber,
-						createTransferRequest.getTransferredAccountNumber(), createTransferRequest.getAmount());
+		checkIfEnoughBalance(senderAccountNumber, createTransferRequest.getAmount());
 
-				Account account = this.iAccountRepository.transferBetweenAccounts(senderAccountNumber,
-						createTransferRequest.getTransferredAccountNumber(), createTransferRequest.getAmount(),
-						exchangeAmount);
+		double exchangeAmount = checkExchangeAmount(senderAccountNumber,
+				createTransferRequest.getTransferredAccountNumber(), createTransferRequest.getAmount());
 
-				String message = senderAccountNumber + " transfer amount:" + createTransferRequest.getAmount() + " "
-						+ account.getType() + " transferred_account:"
-						+ createTransferRequest.getTransferredAccountNumber();
-				kafkaTemplate.send(topicName, message);
-				return new SuccessDataResult<Account>(account, message);
-			}
-		}
+		Account account = this.iAccountRepository.transferBetweenAccounts(senderAccountNumber,
+				createTransferRequest.getTransferredAccountNumber(), createTransferRequest.getAmount(), exchangeAmount);
+
+		String message = senderAccountNumber + " transfer amount:" + createTransferRequest.getAmount() + " "
+				+ account.getType() + " transferred_account:" + createTransferRequest.getTransferredAccountNumber();
+		kafkaTemplate.send(topicName, message);
+		return new SuccessDataResult<Account>(account, message);
+
 	}
 
 	@Override
 	public DataResult<List<Account>> getAll() {
-		return new SuccessDataResult<List<Account>>(this.iAccountRepository.getAll(), "Listed Accounts");
+		return new SuccessDataResult<List<Account>>(this.iAccountRepository.getAll(), Messages.LISTEDALLACCOUNTS);
 	}
 
 	@Override
 	public DataResult<List<GetListLogDto>> getAccountLogsByAccountNumber(String accountNumber) {
 
-		if (!checkIfAccountExists(accountNumber)) {
-			return new ErrorDataResult<List<GetListLogDto>>("This account number cannot be found");
-		}
+		checkIfAccountExists(accountNumber);
 		return this.iKafkaLoggerService.getLogsByAccountNumber(accountNumber);
 	}
 
@@ -159,7 +145,7 @@ public class AccountManager implements IAccountService {
 				return true;
 			}
 		}
-		return false;
+		throw new BusinessException(Messages.INVALIDACCOUNTTYPE + accountType);
 	}
 
 	// or UUID.randomUUID().toString();
@@ -171,10 +157,11 @@ public class AccountManager implements IAccountService {
 	}
 
 	private boolean checkIfEnoughBalance(String accountNumber, double amount) {
+
 		if (this.iAccountRepository.getByAccountNumber(accountNumber).getBalance() > amount) {
 			return true;
 		}
-		return false;
+		throw new BusinessException(Messages.INSUFFICIENTBALANCE);
 	}
 
 	private boolean checkIfAccountExists(String accountNumber) {
@@ -182,7 +169,7 @@ public class AccountManager implements IAccountService {
 		if (this.iAccountRepository.getByAccountNumber(accountNumber) != null) {
 			return true;
 		}
-		return false;
+		throw new BusinessException(Messages.NOTFOUNDACCOUNTNUMBER);
 	}
 
 	private double checkExchangeAmount(String senderAccountNumber, String transferredAccountNumber, double amount) {

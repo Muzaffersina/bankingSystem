@@ -2,6 +2,8 @@ package com.msa.bankingsystem.api.controllers;
 
 import java.util.List;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -40,7 +42,7 @@ public class AccountsController {
 	}
 
 	@PostMapping(path = "/account")
-	private ResponseEntity<Result> createAccount(@RequestBody CreateAccountRequest createAccountRequest) {
+	private ResponseEntity<Result> createAccount(@RequestBody @Valid CreateAccountRequest createAccountRequest) {
 
 		Result result = this.iAccountService.create(createAccountRequest);
 
@@ -69,7 +71,7 @@ public class AccountsController {
 	@PutMapping(path = "/account/{accountNumber}")
 	private ResponseEntity<DataResult<GetListAccountDto>> deposit(
 			@PathVariable(name = "accountNumber") String accountNumber,
-			@RequestBody CreateDepositRequest createDepositRequest) {
+			@RequestBody @Valid CreateDepositRequest createDepositRequest) {
 
 		DataResult<Account> account = this.iAccountService.deposit(accountNumber, createDepositRequest);
 
@@ -88,7 +90,7 @@ public class AccountsController {
 	@PutMapping(path = "/account/transfer/{senderAccountNumber}")
 	private ResponseEntity<DataResult<GetListAccountDto>> transferBetweenAccounts(
 			@PathVariable(name = "senderAccountNumber") String senderAccountNumber,
-			@RequestBody CreateTransferRequest createTransferRequest) {
+			@RequestBody @Valid CreateTransferRequest createTransferRequest) {
 
 		DataResult<Account> account = this.iAccountService.transferBetweenAccounts(senderAccountNumber,
 				createTransferRequest);
