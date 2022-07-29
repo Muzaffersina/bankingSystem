@@ -4,7 +4,7 @@
 "http://mybatis.org/dtd/mybatis-3-config.dtd">
 <configuration>
 	<settings>
-		<setting name="mapUnderscoreToCamelCase" value="true"/>
+		<setting name="mapUnderscoreToCamelCase" value="true" />
 	</settings>
 	<environments default="development">
 		<environment id="development">
@@ -20,6 +20,7 @@
 	</environments>
 	<mappers>
 		<mapper resource="accountmapper.xml" />
-		<mapper resource="logsmapper.xml"/>
+		<mapper resource="logsmapper.xml" />
+		<mapper resource="usersmapper.xml" />
 	</mappers>
 </configuration>

@@ -14,15 +14,37 @@
 # 
 
 
-:exclamation: If you want to save in database, you need to make the necessary configurations from the myBatis_conf.xml.
+:exclamation: :exclamation: If you want to save in database, you need to make the necessary configurations from the myBatis_conf.xml.
 
-:exclamation: You have to write your Collection API Key in exchangeServis.properties.
+:exclamation: :exclamation: Each user can access with their own account number.
 
-:exclamation: Apache kafka was used for account logs.
+:exclamation: :exclamation: You have to write your Collection API Key in exchangeServis.properties.
 
-:exclamation: myBatis was used to access the database. (MyBatis couples objects with stored procedures or SQL statements using an XML descriptor or annotations)
+:star: Apache kafka was used for account logs.
 
-:star: Firstall you have to start zookeeper server and apache kafka server from console then the topic will be created automatically when the application is started.
+:star: myBatis was used to access the database. (MyBatis couples objects with stored procedures or SQL statements using an XML descriptor or annotations)
+
+
+:star: :star:  Firstall you have to start zookeeper server and apache kafka server from console then the topic will be created automatically when the application is started.
+
+:star: Then, you need to log in to the system with the previously saved user information.
+
+
+ **Method**        | **Url**                     | **Description**        | **Body** |
+| ------------- |:-------------                  | :------------          | :------------| 
+| Post          | .../api/auth                   |  Login                 | Necessary| 
+
+- Body;
+
+  - For Create Account;
+      ```
+    {
+    "username" : "string",
+    "password" : "string"
+    }
+      ```
+
+#
 
 
 | **Method**        | **Url**                     | **Description**        | **Body** |

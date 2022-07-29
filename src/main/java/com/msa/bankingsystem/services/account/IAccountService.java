@@ -1,4 +1,4 @@
-package com.msa.bankingsystem.services;
+package com.msa.bankingsystem.services.account;
 
 import java.util.List;
 

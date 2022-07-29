@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class Account {
 	private int id;
+	private int userId;     ////
 	private String accountNumber;
 	private String name;
 	private String surname;

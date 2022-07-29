@@ -1,4 +1,4 @@
-package com.msa.bankingsystem.services;
+package com.msa.bankingsystem.services.account;
 
 import java.util.List;
 import java.util.Random;
@@ -6,6 +6,7 @@ import java.util.Random;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.msa.bankingsystem.core.exception.BusinessException;
@@ -22,6 +23,7 @@ import com.msa.bankingsystem.services.message.Messages;
 import com.msa.bankingsystem.services.requests.CreateAccountRequest;
 import com.msa.bankingsystem.services.requests.CreateDepositRequest;
 import com.msa.bankingsystem.services.requests.CreateTransferRequest;
+import com.msa.bankingsystem.services.securityConfig.MyCustomUser;
 
 @Service
 public class AccountManager implements IAccountService {
@@ -51,11 +53,14 @@ public class AccountManager implements IAccountService {
 	public Result create(CreateAccountRequest createAccountRequest) {
 
 		checkIfType(createAccountRequest.getType(), this.definedTypes);
+		MyCustomUser authUser = (MyCustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
 		Account account = manuelAccountMapper(createAccountRequest);
+
 		account.setDeleted(false);
 		account.setLastUpdateDate(System.currentTimeMillis());
 		account.setBalance(0);
+		account.setUserId(authUser.getId());
 		this.iAccountRepository.save(account);
 		return new SuccessResult(Messages.CREATEACCOUNT + account.getAccountNumber());
 	}

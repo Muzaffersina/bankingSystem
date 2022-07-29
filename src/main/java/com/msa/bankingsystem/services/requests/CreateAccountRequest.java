@@ -24,7 +24,7 @@ public class CreateAccountRequest {
 	private String surname;
 
 	@NotNull(message = "email" + Messages.VALIDATIONNOTNULLERRORS)
-	@Email(regexp = "@",message =Messages.VALIDATIONEMAILERRORS)
+	@Email(message =Messages.VALIDATIONEMAILERRORS)
 	@Size(min=5,max = 30)
 	private String email;
 

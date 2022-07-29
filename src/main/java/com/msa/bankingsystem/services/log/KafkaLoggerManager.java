@@ -14,14 +14,14 @@ import com.msa.bankingsystem.services.dtos.GetListLogDto;
 import com.msa.bankingsystem.services.message.Messages;
 
 @Service
-public class KafkaFileLoggerManager implements IKafkaLoggerService {
+public class KafkaLoggerManager implements IKafkaLoggerService {
 
 	@Value(value = "${kafka.topicName}")
 	public String topicName;
 	private ILogRepository iLogRepository;
 
 	@Autowired
-	public KafkaFileLoggerManager(ILogRepository iLogRepository) {
+	public KafkaLoggerManager(ILogRepository iLogRepository) {
 		this.iLogRepository = iLogRepository;
 
 	}

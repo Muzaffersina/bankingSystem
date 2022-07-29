@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Repository;
 
 import com.msa.bankingsystem.core.externalServices.ExchangeChanger;
 import com.msa.bankingsystem.core.file.FileReaders;
@@ -13,10 +12,9 @@ import com.msa.bankingsystem.core.file.FileWriters;
 import com.msa.bankingsystem.core.mapper.AccountMapper;
 import com.msa.bankingsystem.models.Account;
 
-@Repository
 public class AccountLocalFileRepository implements IAccountRepository {
 
-	@Value("${local.dbFile}")
+	@Value("${local.dbAccountsFile}")
 	private String filePath;
 
 	private FileWriters fileWriters;
@@ -36,6 +34,7 @@ public class AccountLocalFileRepository implements IAccountRepository {
 	public void save(Account account) {
 
 		account.setId(checkLastId());
+		account.setUserId(checkLastId());
 		String text = this.accountMapper.accountToString(account);
 		this.fileWriters.writeToFile(filePath, text, true);
 	}
