@@ -32,11 +32,11 @@
 
  **Method**        | **Url**                     | **Description**        | **Body** |
 | ------------- |:-------------                  | :------------          | :------------| 
-| Post          | .../api/auth                   |  Login                 | Necessary| 
+| Post          | .../api/auth                   |  Log in                | Necessary| 
 
 - Body;
 
-  - For Create Account;
+  - For Log in;
       ```
     {
     "username" : "string",
